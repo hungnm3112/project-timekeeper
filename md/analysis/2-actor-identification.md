@@ -28,21 +28,20 @@
 ### Câu 3: Ai xem báo cáo, giám sát và ra quyết định? (Supervisory Actor)
 * **Nguồn truy vết:** Câu 4 (Ai sử dụng) và Câu 5 (Tiêu chí nghiệm thu báo cáo) ở Bước 1.
 * **Kết quả phân tích:**
-  * Nhóm giám sát được tách thành **2 Actor độc lập** theo phạm vi dữ liệu (*Data Scope*) được xác thực từ API của Hệ thống gốc (cùng ở chế độ *Read-only*):
-    1. **`ACT-02: Ban Giám đốc (BOD)`** — Giám sát, xem danh sách công việc và báo cáo thống kê tiến độ theo ngày, tuần, tháng của **toàn bộ các phòng ban** trong công ty (`API Scope: ALL`).
-    2. **`ACT-03: Quản lý phòng ban (Department Manager)`** — Giám sát, xem danh sách công việc và báo cáo thống kê tiến độ ngày, tuần, tháng **trong phạm vi phòng ban mình quản lý** (`API Scope: DEPARTMENT`).
+  * Áp dụng **Quy tắc 1 (Gộp chức danh trùng quyền)**: Ban Giám đốc và Quản lý các cấp có cùng hành vi trên phần mềm (xem báo cáo tiến độ ngày, tuần, tháng ở chế độ *Read-only*) nên được hợp nhất thành **01 Actor giám sát duy nhất**:
+    * **`ACT-02: Quản lý (Manager)`** — Giám sát, xem danh sách công việc đang làm và tiến độ trong ngày của nhân sự, cũng như xem báo cáo thống kê tổng hợp công việc theo tuần, tháng (*Read-only*) khi API Hệ thống gốc xác nhận có quyền xem (`can_view_report = true`).
 
 ---
 
 ### Câu 4: Người dùng cuối tương tác trực tiếp hay gián tiếp & Đối tượng nào bị loại trừ thành Thực thể dữ liệu? (Self-service User vs Data Entity)
 * **Nguồn truy vết:** Câu 2 và Câu 4 ở Bước 1.
 * **Kết quả phân tích:**
-  * **Tương tác trực tiếp (Self-service Users):** Toàn bộ các tác nhân con người đều tự thao tác trực tiếp với hệ thống (không có người nhập hộ):
-    * **Nhân viên (`ACT-01`):** Tự quản lý Template Task cá nhân, tự chọn/tạo task khi Check-in, tự cập nhật % tiến độ khi Check-out và xem lịch sử cá nhân.
-    * **Ban Giám đốc (`ACT-02`) & Quản lý phòng ban (`ACT-03`):** Trực tiếp truy vấn xem báo cáo, tiến độ công việc theo phạm vi quyền hạn được API hệ thống gốc xác nhận.
+  * **Tương tác trực tiếp (Self-service Users):** Chỉ gồm **02 Human Actors** tự thao tác trực tiếp với hệ thống (không có người nhập hộ):
+    1. **Nhân viên (`ACT-01`):** Tự quản lý Template Task cá nhân, tự chọn/tạo task khi Check-in, tự cập nhật % tiến độ khi Check-out và xem lịch sử cá nhân.
+    2. **Quản lý (`ACT-02`):** Trực tiếp truy vấn xem danh sách công việc trong ngày và báo cáo tiến độ tuần/tháng.
   * **Đối tượng thụ động bị loại trừ khỏi Actor (chuyển thành Thực thể dữ liệu - Data Entities cho Bước 5):**
-    * `Công việc mẫu (Task Template)`: Dữ liệu mẫu do nhân viên tự tạo trước để tái sử dụng nhanh khi Check-in.
-    * `Checklist ngày & Đầu việc (Daily Checklist / Task Item)`: Bản ghi công việc và % tiến độ gắn với từng ngày làm việc của nhân viên.
+    * `ENT-01: Công việc mẫu (Task Template)` — Dữ liệu mẫu do nhân viên tự tạo trước để tái sử dụng nhanh khi Check-in.
+    * `ENT-02: Checklist ngày & Đầu việc (Daily Checklist / Task Item)` — Bản ghi công việc và % tiến độ gắn với từng ngày làm việc của nhân viên.
 
 ---
 
@@ -52,8 +51,8 @@
   * Có **01 Actor Hệ thống ngoài**:
     * **`ACT-EXT-01: Hệ thống gốc SC24h (External Timekeeping & Permission API)`** — Giao tiếp hai chiều tự động qua API với Backend TimeKeeper để:
       1. Xử lý ghi nhận thời gian **Check-in / Check-out tức thời** ngay khi User bấm chấm công.
-      2. Kiểm tra xem User có thuộc diện **phải nộp báo cáo Checklist** khi Check-in / Check-out hay không.
-      3. Kiểm tra **quyền xem báo cáo Checklist Task** (và phạm vi danh sách nhân sự / phòng ban được phép xem) khi User truy vấn báo cáo.
+      2. Kiểm tra xem User có thuộc diện **phải nộp báo cáo Checklist** khi Check-in / Check-out hay không (`require_checklist`).
+      3. Kiểm tra User có **quyền Quản lý xem báo cáo Checklist Task** hay không (`can_view_report`).
 
 ---
 
@@ -61,7 +60,7 @@
 * **Nguồn truy vết:** Câu 3 và Câu 5 (Yêu cầu báo cáo tổng hợp tuần/tháng) ở Bước 1.
 * **Kết quả phân tích:**
   * Có **01 tác vụ chạy ngầm bên trong ranh giới hệ thống** *(không vẽ thành Actor trên DFD Level 0 ở Bước 3, mà chuyển thẳng vào Cây chức năng FDD ở Bước 4)*:
-    * **`JOB-01: Cron Job Tổng hợp Báo cáo Cuối ngày (Daily Report Aggregation Job)`** — Tự động kích hoạt vào cuối mỗi ngày để tổng hợp dữ liệu checklist và tiến độ hoàn thành trong ngày, giúp tối ưu tốc độ truy vấn báo cáo tuần/tháng cho Ban Giám đốc và Quản lý phòng ban.
+    * **`JOB-01: Cron Job Tổng hợp Báo cáo Cuối ngày (Daily Report Aggregation Job)`** — Tự động kích hoạt vào cuối mỗi ngày để tổng hợp dữ liệu checklist và tiến độ hoàn thành trong ngày, giúp tối ưu tốc độ truy vấn báo cáo tuần/tháng cho Quản lý (`ACT-02`).
 
 ---
 
@@ -69,7 +68,7 @@
 * **Nguồn truy vết:** Câu 4 và quyết định kiến trúc `D3` ở Bước 1.
 * **Kết quả phân tích:**
   * **Không có Actor `System Admin` trên hệ thống TimeKeeper.**
-  * Toàn bộ việc quản lý tài khoản, cấu hình đối tượng phải nộp báo cáo Checklist khi Check-in/Check-out và phân quyền ai được xem báo cáo Checklist đều được quản lý tập trung bên **Hệ thống gốc SC24h (`ACT-EXT-01`)** và cung cấp cho TimeKeeper thông qua API.
+  * Toàn bộ việc quản lý tài khoản, cấu hình đối tượng phải nộp báo cáo Checklist khi Check-in/Check-out và phân quyền Quản lý xem báo cáo Checklist đều được quản lý tập trung bên **Hệ thống gốc SC24h (`ACT-EXT-01`)** và cung cấp cho TimeKeeper thông qua API.
 
 ---
 
@@ -80,9 +79,8 @@
 | Mã Actor | Tên Actor | Phân loại | Phạm vi Dữ liệu (Scope) | Trách nhiệm & Tương tác chính qua API |
 |:---:|---|---|---|---|
 | **`ACT-01`** | **Nhân viên (Employee)** | Human Actor (Primary) | `OWN` (Cá nhân) | - Tạo, sửa, xóa danh sách **Template Task** cá nhân.<br>- Chọn task từ Template hoặc tạo task mới khi **Check-in**.<br>- Cập nhật **% tiến độ hoàn thành (0-100%)** hoặc trạng thái **chưa làm** khi **Check-out**.<br>- Xem lịch sử Checklist các ngày/tuần trước của bản thân. |
-| **`ACT-02`** | **Ban Giám đốc (BOD)** | Human Actor (Supervisory) | `API Scope: ALL` (Toàn công ty) | - Xem danh sách công việc và tiến độ trong ngày của nhân sự toàn công ty.<br>- Xem báo cáo thống kê tiến độ theo tuần, tháng toàn công ty (*Read-only*). |
-| **`ACT-03`** | **Quản lý phòng ban (Department Manager)** | Human Actor (Supervisory) | `API Scope: DEPARTMENT` (Phòng ban quản lý) | - Xem danh sách công việc và tiến độ trong ngày của nhân sự thuộc phòng mình.<br>- Xem báo cáo thống kê tiến độ tuần, tháng của phòng mình (*Read-only*). |
-| **`ACT-EXT-01`** | **Hệ thống gốc SC24h (External System API)** | External System Actor | `INTEGRATION` (Hệ thống tích hợp) | - Xử lý API Check-in / Check-out tức thời.<br>- Cung cấp API kiểm tra User có phải nộp báo cáo Checklist không.<br>- Cung cấp API kiểm tra quyền & phạm vi xem báo cáo Checklist Task. |
+| **`ACT-02`** | **Quản lý (Manager)** | Human Actor (Supervisory) | `API Verified` (`can_view_report = true`) | - Xem danh sách công việc và tiến độ trong ngày của nhân sự.<br>- Xem báo cáo thống kê tiến độ công việc theo tuần, tháng (*Read-only*). |
+| **`ACT-EXT-01`** | **Hệ thống gốc SC24h (External System API)** | External System Actor | `INTEGRATION` (Hệ thống tích hợp) | - Xử lý API Check-in / Check-out tức thời.<br>- Cung cấp API kiểm tra User có phải nộp báo cáo Checklist không.<br>- Cung cấp API kiểm tra User có quyền Quản lý xem báo cáo không. |
 
 ---
 
@@ -124,8 +122,7 @@ flowchart LR
         subgraph HUM["Actor Con người (Human Actors)"]
             direction LR
             ACT01["<b>ACT-01: Nhân viên</b><br/>(Primary Actor)<br/>Quản lý Template Task,<br/>Check-in/out Checklist & Lịch sử"]
-            ACT02["<b>ACT-02: Ban Giám đốc</b><br/>(Supervisory Actor)<br/>Xem báo cáo toàn công ty<br/>(Ngày/Tuần/Tháng)"]
-            ACT03["<b>ACT-03: Quản lý phòng ban</b><br/>(Supervisory Actor)<br/>Xem báo cáo nội bộ phòng<br/>(Ngày/Tuần/Tháng)"]
+            ACT02["<b>ACT-02: Quản lý</b><br/>(Supervisory Actor)<br/>Xem tiến độ công việc & Báo cáo<br/>(Ngày/Tuần/Tháng)"]
         end
         subgraph SYS_EXT["Actor Hệ thống ngoài (External Systems)"]
             EXT01["<b>ACT-EXT-01: Hệ thống gốc SC24h</b><br/>(External System API)<br/>API Chấm công tức thời, Kiểm tra nghĩa vụ<br/>nộp Checklist & Quyền xem báo cáo"]

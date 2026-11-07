@@ -7,24 +7,23 @@
 
 ## 1. Bảng Đặc tả Actor – Hành động & Luồng Dữ liệu (Bảng 5 Cột Chuẩn hóa)
 
-Bảng dưới đây định nghĩa toàn bộ 10 tương tác vào/ra (Input/Output) giữa 4 Actor chuẩn hóa ở Bước 2 với hệ thống **TimeKeeper API (`Process 0`)**:
+Bảng dưới đây định nghĩa toàn bộ 9 tương tác vào/ra (Input/Output) giữa 3 Actor chuẩn hóa ở Bước 2 với hệ thống **TimeKeeper API (`Process 0`)**:
 
 | Actor | Mã | Hành động | Dữ liệu Input (Actor gửi vào) | Dữ liệu Output (Actor nhận lại) |
 |---|:---:|---|---|---|
-| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 01]` | Quản lý Template Task cá nhân | Thông tin công việc mẫu (tên task, mô tả, thao tác tạo/sửa/xóa) | Danh sách Template Task cá nhân & kết quả lưu |
-| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 02]` | Check-in & Lập Checklist công việc trong ngày | 1. Yêu cầu Check-in đầu ngày<br/>2. Danh sách công việc chọn từ Template hoặc tạo mới (nếu thuộc diện nộp báo cáo) | 1. Kết quả Check-in tức thời + Cờ `require_checklist` + List Template Task<br/>2. Xác nhận lưu Checklist ngày thành công |
-| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 03]` | Check-out & Cập nhật tiến độ công việc | 1. Yêu cầu Check-out cuối ngày<br/>2. Dữ liệu cập nhật `% tiến độ (0-100%)` hoặc `chưa làm` cho từng task | 1. Kết quả Check-out tức thời + Cờ `require_checklist` + List task ngày hôm nay<br/>2. Xác nhận cập nhật tiến độ thành công |
-| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 04]` | Xem lịch sử Checklist cá nhân | Bộ lọc thời gian (từ ngày – đến ngày, tuần/tháng) | Lịch sử danh sách công việc & % tiến độ các ngày/tuần trước của bản thân |
-| **Ban Giám đốc**<br/>(`ACT-02`) | `[Ban Giám đốc - 01]` | Xem công việc & tiến độ trong ngày (Toàn công ty) | Bộ lọc ngày, mã phòng ban, mã nhân viên | Danh sách công việc đang làm trong ngày & % tiến độ của nhân sự |
-| **Ban Giám đốc**<br/>(`ACT-02`) | `[Ban Giám đốc - 02]` | Xem báo cáo thống kê tuần/tháng (Toàn công ty) | Bộ lọc chu kỳ (tuần/tháng), mã phòng ban | Số liệu tổng hợp khối lượng việc, tỷ lệ hoàn thành & tiến độ các phòng ban |
-| **Quản lý phòng ban**<br/>(`ACT-03`) | `[Quản lý phòng ban - 01]` | Xem công việc & tiến độ trong ngày (Nội bộ phòng) | Bộ lọc ngày, mã nhân viên thuộc phòng ban quản lý | Danh sách công việc trong ngày & % tiến độ của nhân viên trong phòng |
-| **Quản lý phòng ban**<br/>(`ACT-03`) | `[Quản lý phòng ban - 02]` | Xem báo cáo thống kê tuần/tháng (Nội bộ phòng) | Bộ lọc chu kỳ (tuần/tháng), mã nhân viên thuộc phòng ban | Báo cáo tổng hợp khối lượng công việc & tỷ lệ hoàn thành của phòng mình |
-| **Hệ thống gốc SC24h**<br/>(`ACT-EXT-01`) | `[Hệ thống gốc - 01]` | Xử lý Check-in / Check-out tức thời | Kết quả ghi nhận thời gian Check-in / Check-out tức thời của User | Yêu cầu gọi API Check-in / Check-out tức thời ngay khi User bấm chấm công |
-| **Hệ thống gốc SC24h**<br/>(`ACT-EXT-01`) | `[Hệ thống gốc - 02]` | Kiểm tra nghĩa vụ nộp Checklist & Quyền xem báo cáo | Kết quả kiểm tra cờ `require_checklist` (khi chấm công) & quyền/phạm vi xem báo cáo Checklist Task | Yêu cầu gọi API kiểm tra nghĩa vụ nộp báo cáo & quyền xem báo cáo của User |
+| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 01]` | Quản lý Template Task cá nhân | Thông tin công việc mẫu (tên task, mô tả, thao tác tạo/sửa/xóa) | Danh sách Template Task cá nhân và kết quả lưu |
+| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 02]` | Thực hiện Check-in và lập Checklist công việc trong ngày | 1. Yêu cầu Check-in đầu ngày<br/>2. Danh sách công việc chọn từ Template hoặc tạo mới (nếu thuộc diện nộp báo cáo) | 1. Kết quả Check-in tức thời, cờ `require_checklist` và danh sách Template Task nếu có<br/>2. Xác nhận lưu Checklist ngày thành công |
+| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 03]` | Thực hiện Check-out và cập nhật tiến độ công việc | 1. Yêu cầu Check-out cuối ngày<br/>2. Dữ liệu cập nhật `% tiến độ (0-100%)` hoặc trạng thái `chưa làm` cho từng task | 1. Kết quả Check-out tức thời, cờ `require_checklist` và danh sách task ngày hôm nay nếu có<br/>2. Xác nhận cập nhật tiến độ thành công |
+| **Nhân viên**<br/>(`ACT-01`) | `[Nhân viên - 04]` | Xem lịch sử Checklist cá nhân | Bộ lọc thời gian (từ ngày – đến ngày, tuần/tháng) | Lịch sử danh sách công việc và tiến độ % các ngày/tuần trước của bản thân |
+| **Quản lý**<br/>(`ACT-02`) | `[Quản lý - 01]` | Xem danh sách công việc và tiến độ trong ngày của cá nhân/ phòng ban | Bộ lọc ngày, mã phòng ban/ mã nhân viên | Danh sách công việc đang làm trong ngày và tiến độ % của nhân sự/ các nhân sự trong phòng ban |
+| **Quản lý**<br/>(`ACT-02`) | `[Quản lý - 02]` | Xem báo cáo thống kê tiến độ tuần/tháng của cá nhân/ phòng ban | Bộ lọc chu kỳ (tuần/tháng), mã phòng ban, mã nhân viên | Số liệu tổng hợp khối lượng công việc, tỷ lệ hoàn thành và tiến độ |
+| **Hệ thống gốc SC24h**<br/>(`ACT-EXT-01`) | `[Hệ thống gốc - 01]` | Xử lý chấm công Check-in / Check-out tức thời | Kết quả ghi nhận thời gian Check-in / Check-out tức thời của User | Yêu cầu gọi API Check-in / Check-out tức thời ngay khi User bấm chấm công |
+| **Hệ thống gốc SC24h**<br/>(`ACT-EXT-01`) | `[Hệ thống gốc - 02]` | Kiểm tra nghĩa vụ nộp báo cáo Checklist | Kết quả kiểm tra cờ bắt buộc nộp báo cáo (`require_checklist`) của User | Yêu cầu gọi API kiểm tra User có phải nộp báo cáo Checklist khi chấm công không |
+| **Hệ thống gốc SC24h**<br/>(`ACT-EXT-01`) | `[Hệ thống gốc - 03]` | Kiểm tra quyền xem báo cáo Checklist | Kết quả kiểm tra quyền xem báo cáo (`can_view_report`) của User | Yêu cầu gọi API kiểm tra User có quyền Quản lý xem báo cáo không |
 
-> **Lưu ý kiến trúc về luồng tích hợp với Hệ thống gốc SC24h (`[Hệ thống gốc - 01/02]`):**  
-> 1. Khi Nhân viên bấm Check-in hoặc Check-out, Backend TimeKeeper gọi **ngay lập tức** sang API chấm công của Hệ thống gốc để ghi nhận thời gian chuẩn xác, đồng thời kiểm tra qua API gốc xem User có phải nộp báo cáo Checklist hay không. Việc chọn/tạo task hoặc cập nhật % tiến độ diễn ra độc lập trên TimeKeeper.  
-> 2. Khi Ban Giám đốc hoặc Quản lý phòng ban xem báo cáo, Backend TimeKeeper kiểm tra quyền và phạm vi xem thông qua API của Hệ thống gốc.
+> **Lưu ý kiến trúc về luồng tích hợp với Hệ thống gốc SC24h (`[Hệ thống gốc - 01/02/03]`):**  
+> 1. Khi Nhân viên bấm Check-in hoặc Check-out, Backend TimeKeeper gọi **ngay lập tức** sang API chấm công của Hệ thống gốc (`[Hệ thống gốc - 01]`) để ghi nhận thời gian chuẩn xác, đồng thời gọi API kiểm tra nghĩa vụ nộp báo cáo (`[Hệ thống gốc - 02]`). Việc chọn/tạo task hoặc cập nhật % tiến độ diễn ra độc lập trên TimeKeeper.  
+> 2. Khi Quản lý xem báo cáo ngày/tuần/tháng, Backend TimeKeeper gọi API kiểm tra quyền xem báo cáo (`[Hệ thống gốc - 03]`).
 
 ---
 
@@ -42,44 +41,38 @@ Bảng dưới đây định nghĩa toàn bộ 10 tương tác vào/ra (Input/Ou
     'fontSize': '13px'
   },
   'flowchart': {
-    'nodeSpacing': 45,
-    'rankSpacing': 90,
+    'nodeSpacing': 50,
+    'rankSpacing': 100,
     'padding': 20
   }
 }}%%
 flowchart LR
     ACT01["<b>ACT-01: Nhân viên</b><br/>(Employee)"]
-    ACT02["<b>ACT-02: Ban Giám đốc</b><br/>(BOD)"]
+    ACT02["<b>ACT-02: Quản lý</b><br/>(Manager)"]
 
     SYS(("<b>Hệ thống TimeKeeper<br/>Checklist API</b><br/>(Process 0)"))
 
-    ACT03["<b>ACT-03: Quản lý phòng ban</b><br/>(Department Manager)"]
     EXT01["<b>ACT-EXT-01: Hệ thống gốc<br/>SC24h (External API)</b>"]
 
     %% ACT-01 <-> SYS (Links 0, 1)
-    ACT01 -->|"Template, Check-in/out<br/>& Tiến độ Task"| SYS
-    SYS -->|"List Task, Trạng thái<br/>& Lịch sử cá nhân"| ACT01
+    ACT01 -->|"01. Thông tin Template Task<br/>02. Check-in, chọn/tạo Task ngày<br/>03. Check-out, cập nhật % tiến độ<br/>04. Bộ lọc lịch sử cá nhân"| SYS
+    SYS -->|"01. Danh sách Template Task<br/>02. Kết quả Check-in, lưu Checklist<br/>03. Kết quả Check-out, lưu tiến độ<br/>04. Lịch sử Checklist cá nhân"| ACT01
 
     %% ACT-02 <-> SYS (Links 2, 3)
-    ACT02 -->|"Bộ lọc Ngày/Tuần/Tháng<br/>& Phòng ban"| SYS
-    SYS -->|"Báo cáo Tiến độ<br/>Toàn công ty"| ACT02
+    ACT02 -->|"01. Bộ lọc ngày, phòng ban/nhân viên<br/>02. Bộ lọc tuần/tháng, phòng ban/nhân viên"| SYS
+    SYS -->|"01. Công việc, tiến độ ngày cá nhân/phòng<br/>02. Thống kê tuần/tháng cá nhân/phòng"| ACT02
 
-    %% ACT-03 <-> SYS (Links 4, 5)
-    ACT03 -->|"Bộ lọc Ngày/Tuần/Tháng<br/>& Nhân viên phòng"| SYS
-    SYS -->|"Báo cáo Tiến độ<br/>Nội bộ phòng ban"| ACT03
-
-    %% EXT-01 <-> SYS (Links 6, 7)
-    EXT01 -->|"Kết quả Chấm công &<br/>Quyền Nộp/Xem Báo cáo"| SYS
-    SYS -->|"Gọi Chấm công ngay &<br/>Check Quyền qua API"| EXT01
+    %% EXT-01 <-> SYS (Links 4, 5)
+    EXT01 -->|"01. Kết quả chấm công tức thời<br/>02. Kết quả cờ phải nộp Checklist<br/>03. Kết quả quyền xem báo cáo"| SYS
+    SYS -->|"01. Gọi API chấm công tức thời<br/>02. Gọi API kiểm tra nghĩa vụ nộp<br/>03. Gọi API kiểm tra quyền xem"| EXT01
 
     %% Styling Nodes
     style SYS fill:#4338ca,stroke:#312e81,stroke-width:3px,color:#ffffff
     style ACT01 fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a
     style ACT02 fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a
-    style ACT03 fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#0f172a
     style EXT01 fill:#eff6ff,stroke:#1d4ed8,stroke-width:2px,color:#1e3a8a
 
     %% Styling Edges: Green (#10b981) for Input, Orange (#f97316) for Output
-    linkStyle 0,2,4,6 stroke:#10b981,stroke-width:2.5px,color:#065f46
-    linkStyle 1,3,5,7 stroke:#f97316,stroke-width:2.5px,color:#9a3412
+    linkStyle 0,2,4 stroke:#10b981,stroke-width:2.5px,color:#065f46
+    linkStyle 1,3,5 stroke:#f97316,stroke-width:2.5px,color:#9a3412
 ```

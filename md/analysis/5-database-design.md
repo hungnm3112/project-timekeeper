@@ -41,3 +41,4 @@ Mỗi phần tử nằm trong mảng `check_list` của bảng `daily_checklist`
 | `description` | `String` | `true` | Mô tả công việc |
 | `progress` | `Number` | `default = 0, max = 100` | Tiến độ công việc khi checkout (`0% - 100%`) |
 | `status` | `String` | `[TODO, PROGRESS, DONE, HOLD, CANCELLED]` | Trạng thái công việc sau khi checkout |
+

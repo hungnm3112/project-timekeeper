@@ -39,7 +39,7 @@
     1. **Nhân viên (`ACT-01`):** Tự chọn/tạo task khi Check-in, tự cập nhật % tiến độ khi Check-out và xem lịch sử cá nhân.
     2. **Quản lý (`ACT-02`):** Trực tiếp truy vấn xem danh sách công việc trong ngày và báo cáo tiến độ tuần/tháng.
   * **Đối tượng thụ động bị loại trừ khỏi Actor (chuyển thành Thực thể dữ liệu - Data Entity cho Bước 5):**
-    * `ENT-01: Checklist công việc ngày (Daily Checklist & Embedded Tasks)` — Bản ghi lưu trữ danh sách các đầu mục công việc làm trong ngày (`check_list[]`), mô tả, % tiến độ và trạng thái sau khi Check-out.
+    * `ENT-01: Checklist công việc ngày (Daily Checklist & Embedded Tasks)` — Bản ghi lưu trữ danh sách các đầu mục công việc làm trong ngày (`tasks[]`), nội dung (`content`), % tiến độ và trạng thái sau khi Check-out.
 
 ---
 
@@ -85,7 +85,7 @@
 
 | Mã Entity | Tên Thực thể Dữ liệu | Lý do không phải là Actor | Ánh xạ Collection (Bước 5) |
 |:---:|---|---|---|
-| **`ENT-01`** | **Checklist ngày (Daily Checklist)** | Bản ghi thụ động lưu trữ danh sách đầu mục công việc làm trong ngày (`check_list[]`), % tiến độ và trạng thái khi Check-out. | `daily_checklist` |
+| **`ENT-01`** | **Checklist ngày (Daily Checklist)** | Bản ghi thụ động lưu trữ danh sách đầu mục công việc làm trong ngày (`tasks[]`), % tiến độ và trạng thái khi Check-out. | `daily_checklist` |
 
 ---
 
@@ -118,7 +118,7 @@ flowchart LR
     end
 
     subgraph K3["2. ĐỐI TƯỢNG BỊ LOẠI TRỪ KHỎI ACTOR — THỰC THỂ DỮ LIỆU"]
-        ENT01["<b>ENT-01: Checklist ngày (daily_checklist)</b><br/>Lưu danh sách đầu mục công việc trong ngày (check_list[])<br/>kèm tiến độ % và trạng thái khi Check-out"]
+        ENT01["<b>ENT-01: Checklist ngày (daily_checklist)</b><br/>Lưu danh sách đầu mục công việc trong ngày (tasks[])<br/>kèm tiến độ % và trạng thái khi Check-out"]
     end
 
     K1 ===>|"Đầu vào Bước 3 & 4"| B3(("Bước 3 & 4:<br/>DFD Level 0 & FDD"))

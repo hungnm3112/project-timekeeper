@@ -3,7 +3,7 @@
 > **Phạm vi phụ trách:** Luồng Kiểm tra Quyền & Quản lý Xem Báo cáo (`FDD-01`, `FDD-02`, `FDD-07`, `FDD-08` — tương ứng `API 01`, `API 07`, `API 08`)  
 > **Đầu vào:**  
 > - [`md/analysis/4-fdd-and-rbac.md`](./4-fdd-and-rbac.md) (Cây chức năng FDD & Ma trận RBAC)  
-> - [`md/analysis/5-database-design.md`](./5-database-design.md) (Thiết kế Collection `daily_checklist`)  
+> - [`md/analysis/5-database-design.md`](./5-database-design.md) (Thiết kế Collection `DailyChecklist`)  
 > - [`md/api/permission-function.md`](../api/permission-function.md) (Logic kiểm tra quyền `can_report` & `can_view_report`)  
 > - [`md/api/jwt_token_info.md`](../api/jwt_token_info.md) (Cấu trúc `req.auth` giải mã từ JWT Access Token)
 
@@ -36,13 +36,13 @@ sequenceDiagram
         par Tab 1 - Giám sát tiến độ công việc trong ngày (API 07 - FDD-07)
             QL->>FE: Lọc theo Ngày (date=YYYY-MM-DD), Chi nhánh (branch_id), Nhân viên (employee_id), Trạng thái (status)
             FE->>TK: GET /api/v1/daily-checklists/reports?date=2026-11-10&branch_id=...&employee_id=...&page=1&limit=20
-            TK->>DB: Check can_view_report == true và Query collection daily_checklist
-            DB-->>TK: Danh sách bản ghi daily_checklist trong ngày + tổng số bản ghi
+            TK->>DB: Check can_view_report == true và Query collection DailyChecklist
+            DB-->>TK: Danh sách bản ghi DailyChecklist trong ngày + tổng số bản ghi
             TK-->>FE: 200 OK (Danh sách nhân viên, tasks, total_tasks, done_tasks, average_progress và pagination)
         and Tab 2 - Báo cáo Lịch tổng hợp công việc Tuần / Tháng (API 08 - FDD-08)
             QL->>FE: Chọn khoảng ngày trên lịch (from_date=YYYY-MM-DD, to_date=YYYY-MM-DD), Chi nhánh (branch_id), Nhân viên (employee_id)
             FE->>TK: GET /api/v1/daily-checklists/summary?from_date=2026-11-09&to_date=2026-11-15&branch_id=...
-            TK->>DB: Check can_view_report == true và Group daily_checklist theo từng ngày (date)
+            TK->>DB: Check can_view_report == true và Group DailyChecklist theo từng ngày (date)
             DB-->>TK: Dữ liệu lịch làm việc gom theo ngày -> danh sách nhân viên và tasks[]
             TK-->>FE: 200 OK (Lịch tuần/tháng: từng ngày có những nhân sự nào làm công việc gì)
         end
@@ -118,7 +118,7 @@ sequenceDiagram
 
 - **Logic xử lý tại Service:**
   1. Kiểm tra quyền `hasPermission(db, req.auth._id, '69710af7090eb0bbb82a89b2')`. Nếu `false` $\longrightarrow$ ném lỗi `403 Forbidden`.
-  2. Lọc các bản ghi trong `daily_checklist` theo khoảng `startOfDay(date)` $\to$ `endOfDay(date)`, kết hợp điều kiện lọc `branch_id` và `employee_id` (nếu có).
+  2. Lọc các bản ghi trong `DailyChecklist` theo khoảng `startOfDay(date)` $\to$ `endOfDay(date)`, kết hợp điều kiện lọc `branch_id` và `employee_id` (nếu có).
   3. Join (`$lookup`) với bảng `Employee` và `Branch` để trả kèm tên nhân viên (`employee_name`) và tên chi nhánh (`branch_name`), đồng thời tính `total_tasks`, `done_tasks` và `average_progress` của từng nhân viên trong ngày hôm đó.
 - **Response `200 OK`:**
 <details>
@@ -193,7 +193,7 @@ sequenceDiagram
 
 - **Logic xử lý tại Service:**
   1. Kiểm tra quyền `can_view_report = true` (`69710af7090eb0bbb82a89b2`). Nếu `false` $\longrightarrow$ trả lỗi `403 Forbidden`.
-  2. Truy vấn collection `daily_checklist` trong khoảng `startOfDay(from_date)` $\to$ `endOfDay(to_date)`, kết hợp điều kiện lọc `branch_id`, `employee_id` và `status` (nếu có).
+  2. Truy vấn collection `DailyChecklist` trong khoảng `startOfDay(from_date)` $\to$ `endOfDay(to_date)`, kết hợp điều kiện lọc `branch_id`, `employee_id` và `status` (nếu có).
   3. Gom nhóm (`$group`) dữ liệu theo **từng ngày làm việc trên lịch (`date`: `YYYY-MM-DD`)** sắp xếp tăng dần/giảm dần theo thời gian:
      - Mỗi phần tử trong mảng trả về đại diện cho **1 ô Ngày trên Lịch (`date`)**.
      - Bên trong mỗi ngày là mảng **`employees`** liệt kê các nhân sự có làm việc trong ngày hôm đó kèm danh sách **`tasks[]`** (`_id`, `content`, `progress`, `status`) của từng người.

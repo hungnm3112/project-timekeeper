@@ -6,21 +6,21 @@
 
 ---
 
-## 1. Tư duy Thiết kế & Lý do Sử dụng 1 Collection Duy nhất (`daily_checklist`)
+## 1. Tư duy Thiết kế & Lý do Sử dụng 1 Collection Duy nhất (`DailyChecklist`)
 
 1. **Ranh giới rõ ràng với chức năng Quản lý công việc sẵn có:**
    - Hệ thống SC24h đã có chức năng Quản lý công việc dành cho các dự án/task dài hạn.
    - Module **TimeKeeper Checklist** tập trung giải quyết bài toán **ghi chú công việc hàng ngày gắn với chấm công Check-in / Check-out**: nắm bắt nhân viên hôm nay làm gì và cuối ngày đạt tiến độ bao nhiêu `%`.
 2. **Cơ chế kế thừa việc chưa xong mà không cần tách thêm bảng:**
-   - Mỗi nhân viên có 1 bản ghi `daily_checklist` cho ngày làm việc (`date`), bên trong nhúng mảng `tasks[]` lưu các đầu mục công việc của ngày hôm đó.
-   - Khi nhân viên Check-in ngày mới, hệ thống có thể truy vấn các công việc chưa hoàn thành (`status` chưa `DONE` / `progress < 100`) từ các ngày trước đó trong chính bảng `daily_checklist` để gợi ý nhân viên chọn tiếp tục làm (copy tạo thành mục mới cho ngày hôm nay) hoặc thêm công việc mới.
+   - Mỗi nhân viên có 1 bản ghi `DailyChecklist` cho ngày làm việc (`date`), bên trong nhúng mảng `tasks[]` lưu các đầu mục công việc của ngày hôm đó.
+   - Khi nhân viên Check-in ngày mới, hệ thống có thể truy vấn các công việc chưa hoàn thành (`status` chưa `DONE` / `progress < 100`) từ các ngày trước đó trong chính bảng `DailyChecklist` để gợi ý nhân viên chọn tiếp tục làm (copy tạo thành mục mới cho ngày hôm nay) hoặc thêm công việc mới.
 
 ---
 
 ## 2. Bảng Đặc tả 4 Cột Chuẩn hóa
 
-### 2.1. Collection: `daily_checklist`
-Lưu trữ thông tin phiên Checklist công việc trong ngày của từng nhân viên.
+### 2.1. Collection: `DailyChecklist` (`{ collection: 'DailyChecklist' }`)
+Lưu trữ thông tin phiên Checklist công việc trong ngày của từng nhân viên (nằm trên kết nối `mongohethong24hdb`, đặt tên theo chuẩn `PascalCase` đồng bộ với `'Employee'`, `'Branch'`).
 
 | field | type | required | des |
 |---|---|---|---|
@@ -33,7 +33,7 @@ Lưu trữ thông tin phiên Checklist công việc trong ngày của từng nh�
 ---
 
 ### 2.2. Cấu trúc Phần tử bên trong Mảng `tasks[]` (Embedded Sub-document)
-Mỗi phần tử nằm trong mảng `tasks` của bảng `daily_checklist` có cấu trúc 4 cột như sau:
+Mỗi phần tử nằm trong mảng `tasks` của bảng `DailyChecklist` có cấu trúc 4 cột như sau:
 
 | field | type | required | des |
 |---|---|---|---|

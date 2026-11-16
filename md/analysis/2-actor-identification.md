@@ -20,7 +20,7 @@
 * **Nguồn truy vết:** Câu 3 (Mục tiêu hệ thống) và Câu 4 ở Bước 1.
 * **Kết quả phân tích:**
   * **Không có Secondary Actor duyệt thủ công.**
-  * Hệ thống vận hành theo cơ chế tự khai báo và tự cập nhật (*Self-reporting*): Ngay sau khi Nhân viên (`ACT-01`) lập checklist lúc Check-in và chốt % tiến độ lúc Check-out, dữ liệu được hệ thống ghi nhận trực tiếp vào `daily_checklist` để phục vụ tra cứu và thống kê báo cáo.
+  * Hệ thống vận hành theo cơ chế tự khai báo và tự cập nhật (*Self-reporting*): Ngay sau khi Nhân viên (`ACT-01`) lập checklist lúc Check-in và chốt % tiến độ lúc Check-out, dữ liệu được hệ thống ghi nhận trực tiếp vào `DailyChecklist` để phục vụ tra cứu và thống kê báo cáo.
 
 ---
 
@@ -55,9 +55,9 @@
 ---
 
 ### Câu 6: Có nghiệp vụ nào tự động chạy ngầm theo thời gian/hàng đợi không? (Automated Process / Background Job)
-* **Nguồn truy vết:** Quyết định thiết kế tối giản 1 Collection (`daily_checklist`).
+* **Nguồn truy vết:** Quyết định thiết kế tối giản 1 Collection (`DailyChecklist`).
 * **Kết quả phân tích:**
-  * **Không sử dụng Background Job / Cron Job.** Toàn bộ dữ liệu ghi chú công việc hàng ngày nằm gọn trên 01 Collection `daily_checklist` có đánh Index theo `employee_id`, `branch_id` và `date`, cho phép truy vấn trực tiếp theo thời gian thực (*Real-time query*).
+  * **Không sử dụng Background Job / Cron Job.** Toàn bộ dữ liệu ghi chú công việc hàng ngày nằm gọn trên 01 Collection `DailyChecklist` có đánh Index theo `employee_id`, `branch_id` và `date`, cho phép truy vấn trực tiếp theo thời gian thực (*Real-time query*).
 
 ---
 
@@ -85,7 +85,7 @@
 
 | Mã Entity | Tên Thực thể Dữ liệu | Lý do không phải là Actor | Ánh xạ Collection (Bước 5) |
 |:---:|---|---|---|
-| **`ENT-01`** | **Checklist ngày (Daily Checklist)** | Bản ghi thụ động lưu trữ danh sách đầu mục công việc làm trong ngày (`tasks[]`), % tiến độ và trạng thái khi Check-out. | `daily_checklist` |
+| **`ENT-01`** | **Checklist ngày (Daily Checklist)** | Bản ghi thụ động lưu trữ danh sách đầu mục công việc làm trong ngày (`tasks[]`), % tiến độ và trạng thái khi Check-out. | `DailyChecklist` |
 
 ---
 
@@ -118,7 +118,7 @@ flowchart LR
     end
 
     subgraph K3["2. ĐỐI TƯỢNG BỊ LOẠI TRỪ KHỎI ACTOR — THỰC THỂ DỮ LIỆU"]
-        ENT01["<b>ENT-01: Checklist ngày (daily_checklist)</b><br/>Lưu danh sách đầu mục công việc trong ngày (tasks[])<br/>kèm tiến độ % và trạng thái khi Check-out"]
+        ENT01["<b>ENT-01: Checklist ngày (DailyChecklist)</b><br/>Lưu danh sách đầu mục công việc trong ngày (tasks[])<br/>kèm tiến độ % và trạng thái khi Check-out"]
     end
 
     K1 ===>|"Đầu vào Bước 3 & 4"| B3(("Bước 3 & 4:<br/>DFD Level 0 & FDD"))

@@ -52,7 +52,7 @@ Xây dựng hệ thống **Backend API (Module Checklist ghi chú công việc h
 | Mục tiêu hệ thống | Tiêu chí đạt cụ thể (Kiểm chứng được qua API) |
 |---|---|
 | **G1: Tích hợp Chấm công tức thời & Kiểm tra điều kiện Checklist qua API** | - Khi User bấm Check-in / Check-out, Backend TimeKeeper gọi ngay API chấm công gốc để không bị lệch thời gian, đồng thời kiểm tra qua API gốc xem User có phải nộp báo cáo checklist hay không.<br>- Việc tạo/chọn task hay cập nhật tiến độ diễn ra độc lập trên TimeKeeper, không làm ảnh hưởng tới hệ thống chấm công gốc. |
-| **G2: Gợi ý việc chưa xong & Luồng Check-in lập Checklist ngày** | - Khi Check-in (nếu thuộc diện nộp báo cáo), nhân viên có thể tìm kiếm / chọn các công việc chưa xong trước đó (tạo bản sao mới cho ngày hôm nay) hoặc thêm công việc mới vào `daily_checklist`. |
+| **G2: Gợi ý việc chưa xong & Luồng Check-in lập Checklist ngày** | - Khi Check-in (nếu thuộc diện nộp báo cáo), nhân viên có thể tìm kiếm / chọn các công việc chưa xong trước đó (tạo bản sao mới cho ngày hôm nay) hoặc thêm công việc mới vào `DailyChecklist`. |
 | **G3: Luồng Check-out cập nhật tiến độ** | - Khi nhân viên thực hiện Check-out, API trả về đúng danh sách công việc đã đăng ký trong ngày hôm nay.<br>- Cho phép cập nhật kết quả từng công việc theo **% tiến độ hoàn thành (0% – 100%)** và trạng thái (`TODO`, `PROGRESS`, `DONE`, `HOLD`, `CANCELLED`). |
 | **G4: Báo cáo & Thống kê cho Quản lý** | - Cung cấp API truy vấn danh sách công việc và thống kê tiến độ theo **ngày hôm nay, theo tuần và theo tháng** của cá nhân / phòng ban sau khi đã xác thực quyền xem báo cáo (`can_view_report = true`) qua API của Hệ thống gốc. |
 
@@ -62,7 +62,7 @@ Xây dựng hệ thống **Backend API (Module Checklist ghi chú công việc h
 
 | Mã | Hạng mục quyết định | Nội dung đã chốt | Trạng thái |
 |:---:|---|---|:---:|
-| **D1** | Phạm vi triển khai dự án | Chỉ xây dựng **Backend API** (NestJS 11 + MongoDB) với **01 Collection duy nhất (`daily_checklist`)** đóng vai trò ghi chú công việc hàng ngày. | `[Đã xác nhận]` |
+| **D1** | Phạm vi triển khai dự án | Chỉ xây dựng **Backend API** với **01 Collection duy nhất (`DailyChecklist`)** đóng vai trò ghi chú công việc hàng ngày. | `[Đã xác nhận]` |
 | **D2** | Mô hình chấm công tức thời | Khi User chấm công, Backend TimeKeeper gọi **ngay lập tức** API chấm công gốc để chốt thời gian chuẩn; việc tạo task / cập nhật tiến độ là hành động độc lập của TimeKeeper. | `[Đã xác nhận]` |
 | **D3** | Cơ chế kiểm tra nghĩa vụ nộp báo cáo & phân quyền | **Thông qua API của Hệ thống gốc SC24h** (TimeKeeper không tự lưu bảng cấu hình phòng ban hay tự xử lý phân quyền nội bộ). | `[Đã xác nhận]` |
 | **D4** | Quyền hạn của Quản lý | Gộp chung Ban Giám đốc & Quản lý phòng ban thành đối tượng **Quản lý (Manager)**; xem báo cáo, thống kê tiến độ công việc theo ngày, tuần, tháng ở chế độ **Read-only** khi API Hệ thống gốc xác nhận có quyền xem. | `[Đã xác nhận]` |
